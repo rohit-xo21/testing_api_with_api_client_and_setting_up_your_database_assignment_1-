@@ -34,7 +34,7 @@
 
 const express = require('express');
 const { resolve } = require('path');
-const students = require("./data.json");
+const fs = require("fs")
 
 const app = express();
 
@@ -48,6 +48,19 @@ app.get('/', (req, res) => {
 
 app.use(express.json());
 
+let students = [];
+
+fs.readFile('./data.json', (err, data) => {
+  if (err) {
+    console.log('Error reading the file:', err);
+    return;
+  }
+  try {
+    students = JSON.parse(data);
+  } catch (err) {
+    console.log('Error parsing JSON:', err);
+  }
+});
 
 app.post('/students/above-threshold', (req,res) => {
   const { threshold } = req.body;
@@ -59,7 +72,7 @@ app.post('/students/above-threshold', (req,res) => {
 
   const filteredStudents = students.filter((el) => {
     return el.total > threshold;
-  })
+  });
   
   res.json({
     count: filteredStudents.length,
